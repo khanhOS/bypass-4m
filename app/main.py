@@ -29,7 +29,7 @@ async def index():
 
 @app.get("/api/health")
 async def health():
-    return {"status": "online", "browser_available": True}
+    return {"status": "online", "browser_configured": True}
 
 @app.post("/api/bypass")
 async def bypass_endpoint(payload: BypassRequest):

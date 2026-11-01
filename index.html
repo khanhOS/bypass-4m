@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020"><title>Auto Bypass — Link4m</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#111a2b;--panel2:#172238;--text:#edf3ff;--muted:#94a3b8;--line:#26344d;--accent:#8b7cff;--good:#34d399;--bad:#fb7185}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#28315c 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{width:min(760px,calc(100% - 32px));margin:0 auto;padding:42px 0 64px}.top{display:flex;align-items:center;gap:12px;margin-bottom:38px}.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#8b7cff,#4f46e5);display:grid;place-items:center;font-size:22px}.brand{font-weight:750}.sub{color:var(--muted);font-size:12px}.hero{text-align:center;margin-bottom:28px}.hero h1{font-size:clamp(28px,6vw,42px);line-height:1.1;margin:0 0 12px;letter-spacing:-1.3px}.hero p{color:var(--muted);margin:0}
+.panel{background:linear-gradient(180deg,#141e31,#101827);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 24px 70px #0005}.label{display:block;font-size:13px;font-weight:650;margin-bottom:9px}
+input{width:100%;background:#090f1d;border:1px solid #34435e;border-radius:12px;padding:15px;color:var(--text);font:inherit;outline:none}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #8b7cff22}
+.primary{width:100%;border:0;border-radius:12px;padding:14px;margin-top:13px;background:linear-gradient(100deg,#7868f6,#6254dc);color:white;font:700 15px system-ui;cursor:pointer}.primary:disabled{opacity:.55;cursor:wait}.hint{font-size:12px;color:var(--muted);margin:11px 2px 0}
+.status{display:none;margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#0c1422}.status.show{display:block}.status.success{border-color:#176b52}.status.error{border-color:#7f3446}.statusline{display:flex;align-items:center;gap:10px;font-weight:650;flex-wrap:wrap}.spinner{width:17px;height:17px;border:2px solid #53617c;border-top-color:#a99fff;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.timer{color:#c4baff;font-variant-numeric:tabular-nums}
+.result{margin-top:14px;overflow-wrap:anywhere;background:#071b19;border:1px solid #176b52;padding:13px;border-radius:10px;color:#a7f3d0}.small{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:8px 12px;border-radius:9px;cursor:pointer;margin:10px 6px 0 0}
+.history{margin-top:22px}.history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.history h2{font-size:16px;margin:0}.empty{color:var(--muted);font-size:13px;padding:18px 0}.item{border-top:1px solid var(--line);padding:13px 0;overflow-wrap:anywhere}.item a{color:#b9b0ff;text-decoration:none}.meta{font-size:12px;color:var(--muted);margin-top:4px}footer{text-align:center;color:#718096;font-size:12px;margin-top:28px}
+@media(max-width:520px){.wrap{padding-top:26px}.panel{padding:17px}.hero{margin-bottom:22px}}
+
+.settings{margin-top:17px;padding-top:14px;border-top:1px solid var(--line)}
+.settings summary{cursor:pointer;color:#c7c2ff;font-size:13px;font-weight:650;outline:none}
+.settings label{display:block;margin:14px 0 8px;font-size:12px;color:var(--muted)}
+.settings input{padding:11px;font-size:13px}
+.settings .hint{margin-top:8px}
+.settings-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#apiSaved{font-size:12px;color:var(--good);overflow-wrap:anywhere}
+</style></head>
+<body><main class="wrap">
+<header class="top"><div class="logo">↗</div><div><div class="brand">AUTO BYPASS</div><div class="sub">LINK4M URL RESOLVER</div></div></header>
+<section class="hero"><h1>Đưa bạn đến <span style="color:#a99fff">đích</span></h1><p>Dán link Link4m để xử lý các bước chuyển hướng thông thường.</p></section>
+<section class="panel"><label class="label" for="url">Link Link4m</label><input id="url" type="url" placeholder="https://link4m.net/..." autocomplete="url" maxlength="2048"><button class="primary" id="submit">Vượt link ngay →</button><p class="hint">Chỉ hỗ trợ link4m.net. CAPTCHA hoặc xác minh truy cập cần được xử lý thủ công.</p>
+<div id="status" class="status" role="status" aria-live="polite"><div class="statusline"><span id="spinner" class="spinner"></span><span id="message">Đang xử lý...</span><span id="timer" class="timer"></span></div><div id="detail"></div></div>
+<details class="settings"><summary>Cấu hình máy chủ API</summary>
+<label for="apiBase">URL backend Render</label>
+<input id="apiBase" type="url" inputmode="url" placeholder="https://ten-dich-vu.onrender.com" autocomplete="url">
+<p class="hint">GitHub Pages chỉ hiển thị giao diện. Để xử lý link thật, hãy nhập URL dịch vụ FastAPI đã deploy trên Render rồi nhấn Lưu cấu hình.</p>
+<div class="settings-actions"><button class="small" id="saveApi" type="button">Lưu cấu hình</button><span id="apiSaved" aria-live="polite"></span></div>
+</details></section>
+<section class="history"><div class="history-head"><h2>Lịch sử trong phiên</h2><div><button class="small" id="export-json">JSON</button><button class="small" id="export-csv">CSV</button><button class="small" id="export-txt">TXT</button><button class="small" id="clear">Xóa</button></div></div><div id="historyList" class="empty">Chưa có kết quả nào.</div></section>
+<footer>Auto Bypass · Lịch sử chỉ lưu trong tab hiện tại</footer></main>
+<script>
+const $=id=>document.getElementById(id),KEY='auto-bypass-history-v1',API_KEY='auto-bypass-api-base-v1';let tick=null,start=0;
+function getApiBase(){const raw=$('apiBase').value.trim().replace(/\\/+$/,'');if(!raw)throw new Error('Chưa cấu hình backend. Mở “Cấu hình máy chủ API” và nhập URL Render.');let parsed;try{parsed=new URL(raw)}catch{throw new Error('URL backend không hợp lệ.')}if(!['http:','https:'].includes(parsed.protocol))throw new Error('Backend phải dùng HTTP hoặc HTTPS.');if(parsed.pathname!=='/'||parsed.search||parsed.hash)throw new Error('Chỉ nhập tên miền backend, không thêm đường dẫn.');return parsed.origin}
+$('apiBase').value=localStorage.getItem(API_KEY)||'';
+$('saveApi').addEventListener('click',()=>{try{const base=getApiBase();localStorage.setItem(API_KEY,base);$('apiBase').value=base;$('apiSaved').textContent='Đã lưu: '+base}catch(e){$('apiSaved').textContent=e.message}});
+function history(){try{return JSON.parse(sessionStorage.getItem(KEY)||'[]')}catch{return []}}
+function save(items){sessionStorage.setItem(KEY,JSON.stringify(items.slice(0,30)));renderHistory()}
+function renderHistory(){const list=history(),root=$('historyList');root.replaceChildren();if(!list.length){root.className='empty';root.textContent='Chưa có kết quả nào.';return}root.className='';list.forEach(item=>{const row=document.createElement('div');row.className='item';const a=document.createElement('a');a.href=item.destination||'#';a.textContent=item.destination||item.original;a.target='_blank';a.rel='noopener noreferrer';const meta=document.createElement('div');meta.className='meta';meta.textContent=(item.success?'Thành công':'Thất bại')+' · '+item.time+'s · '+new Date(item.at).toLocaleString();row.append(a,meta);root.append(row)})}
+function setStatus(kind,msg,detail=''){const box=$('status');box.className='status show '+kind;$('message').textContent=msg;$('detail').textContent=detail;$('spinner').style.display=kind==='processing'?'inline-block':'none'}
+function stopTimer(){if(tick)clearInterval(tick);tick=null}
+function download(name,type,content){const blob=new Blob([content],{type}),a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function csvCell(value){return '"'+String(value??'').replaceAll('"','""')+'"'}
+$('submit').addEventListener('click',async()=>{const url=$('url').value.trim();if(!url){setStatus('error','Vui lòng nhập URL.');return}stopTimer();start=performance.now();$('submit').disabled=true;$('detail').textContent='';setStatus('processing','Đang xử lý...');const update=()=>{$('timer').textContent=((performance.now()-start)/1000).toFixed(1)+'s'};update();tick=setInterval(update,100);try{const response=await fetch(getApiBase()+'/api/bypass',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});const data=await response.json();stopTimer();const elapsed=Number(data.time_taken??((performance.now()-start)/1000)).toFixed(2);$('timer').textContent=elapsed+'s';if(!response.ok){const d=data.detail||{};setStatus('error',d.message||'Yêu cầu không hợp lệ.',d.code||'HTTP '+response.status);return}if(data.success&&data.bypassed_url){setStatus('success','Hoàn thành trong '+elapsed+'s');const result=document.createElement('div');result.className='result';result.textContent=data.bypassed_url;$('detail').append(result);const copy=document.createElement('button');copy.className='small';copy.textContent='Copy link đích';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(data.bypassed_url);copy.textContent='Đã copy'}catch{copy.textContent='Không thể copy'}});$('detail').append(copy)}else{const err=data.error||{};setStatus('error',err.message||'Không tìm thấy URL đích.',err.code||'UNKNOWN_ERROR')}const items=history();items.unshift({original:url,destination:data.bypassed_url||null,success:!!data.success,time:elapsed,at:new Date().toISOString()});save(items)}catch(e){stopTimer();setStatus('error',e.message||'Không thể kết nối máy chủ.','Kiểm tra URL backend, cấu hình CORS hoặc trạng thái Render.')}finally{$('submit').disabled=false}});
+$('url').addEventListener('keydown',e=>{if(e.key==='Enter')$('submit').click()});
+$('clear').addEventListener('click',()=>{sessionStorage.removeItem(KEY);renderHistory()});
+$('export-json').addEventListener('click',()=>download('auto-bypass-history.json','application/json',JSON.stringify(history(),null,2)));
+$('export-csv').addEventListener('click',()=>{const rows=[['original','destination','success','time_seconds','created_at'],...history().map(x=>[x.original,x.destination,x.success,x.time,x.at])];download('auto-bypass-history.csv','text/csv;charset=utf-8','\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n'))});
+$('export-txt').addEventListener('click',()=>download('auto-bypass-history.txt','text/plain;charset=utf-8',history().map(x=>'Original: '+x.original+'\nDestination: '+(x.destination||'N/A')+'\nSuccess: '+x.success+'\nTime: '+x.time+'s\nCreated: '+x.at).join('\n\n')));
+renderHistory();
+</script></body></html>

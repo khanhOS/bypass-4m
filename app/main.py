@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from typing import Annotated
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
@@ -15,6 +16,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent
 app = FastAPI(title="Auto Bypass", version="1.0.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://khanhos.github.io", "http://127.0.0.1:5500", "http://localhost:5500"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 semaphore = asyncio.Semaphore(1)
 bypasser = LinkBypasser()

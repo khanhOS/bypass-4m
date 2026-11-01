@@ -38,7 +38,7 @@ input{width:100%;background:#090f1d;border:1px solid #34435e;border-radius:12px;
 <footer>Auto Bypass · Lịch sử chỉ lưu trong tab hiện tại</footer></main>
 <script>
 const $=id=>document.getElementById(id),KEY='auto-bypass-history-v1',API_KEY='auto-bypass-api-base-v1';let tick=null,start=0;
-function getApiBase(){const raw=$('apiBase').value.trim().replace(/\\/+$/,'');if(!raw)throw new Error('Chưa cấu hình backend. Mở “Cấu hình máy chủ API” và nhập URL Render.');let parsed;try{parsed=new URL(raw)}catch{throw new Error('URL backend không hợp lệ.')}if(!['http:','https:'].includes(parsed.protocol))throw new Error('Backend phải dùng HTTP hoặc HTTPS.');if(parsed.pathname!=='/'||parsed.search||parsed.hash)throw new Error('Chỉ nhập tên miền backend, không thêm đường dẫn.');return parsed.origin}
+function getApiBase(){const raw=$('apiBase').value.trim().replace(/\/+$/,'');if(!raw)throw new Error('Chưa cấu hình backend. Mở “Cấu hình máy chủ API” và nhập URL Render.');let parsed;try{parsed=new URL(raw)}catch{throw new Error('URL backend không hợp lệ.')}if(!['http:','https:'].includes(parsed.protocol))throw new Error('Backend phải dùng HTTP hoặc HTTPS.');if(parsed.pathname!=='/'||parsed.search||parsed.hash)throw new Error('Chỉ nhập tên miền backend, không thêm đường dẫn.');return parsed.origin}
 $('apiBase').value=localStorage.getItem(API_KEY)||'';
 $('saveApi').addEventListener('click',()=>{try{const base=getApiBase();localStorage.setItem(API_KEY,base);$('apiBase').value=base;$('apiSaved').textContent='Đã lưu: '+base}catch(e){$('apiSaved').textContent=e.message}});
 function history(){try{return JSON.parse(sessionStorage.getItem(KEY)||'[]')}catch{return []}}

@@ -16,7 +16,7 @@ Web app dùng FastAPI và Playwright Chromium để xử lý các bước chuy�
     playwright install chromium
     uvicorn app.main:app --reload
 
-Mở http://127.0.0.1:8000. API docs tại http://127.0.0.1:8000/docs.
+Mở http://127.0.0.1:8000. API docs tại http://127.0.0.1:8000/docs. Bản chạy local phục vụ giao diện và API cùng một origin.
 
 ## Chạy test
 
@@ -32,7 +32,7 @@ Mở http://127.0.0.1:8000. API docs tại http://127.0.0.1:8000/docs.
 1. Push repository lên GitHub.
 2. Trong Render, chọn New → Blueprint và kết nối repository.
 3. Render đọc render.yaml, build Docker image và triển khai web service.
-4. Kiểm tra /api/health sau khi deploy.
+4. Kiểm tra /api/health sau khi deploy. Trong giao diện GitHub Pages, mở “Cấu hình máy chủ API”, nhập URL Render, nhấn “Kiểm tra kết nối” rồi lưu cấu hình.
 
 Render Free có thể sleep khi không có traffic và cold start khi được gọi lại. RAM và thời gian build phụ thuộc image/dependencies thực tế; Chromium có thể vượt giới hạn tài nguyên của gói Free. Không cam kết mọi lượt xử lý sẽ chạy thành công trên Free tier.
 
@@ -52,4 +52,4 @@ Render Free có thể sleep khi không có traffic và cold start khi được g
 
 ## Ghi chú
 
-Link4m có thể thay đổi giao diện hoặc luồng điều hướng. Cần kiểm thử bằng link công khai được phép sử dụng trước khi coi engine tương thích hoàn toàn. Health endpoint xác nhận ứng dụng phản hồi, không phải phép thử khởi động Chromium.
+Link4m có thể thay đổi giao diện hoặc luồng điều hướng. Cần kiểm thử bằng link công khai được phép sử dụng trước khi coi engine tương thích hoàn toàn. Health endpoint chỉ xác nhận API phản hồi, không phải phép thử khởi động Chromium. GitHub Pages chỉ host giao diện tĩnh; backend FastAPI/Playwright phải được deploy riêng.

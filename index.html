@@ -49,7 +49,28 @@ function setStatus(kind,msg,detail=''){const box=$('status');box.className='stat
 function stopTimer(){if(tick)clearInterval(tick);tick=null}
 function download(name,type,content){const blob=new Blob([content],{type}),a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 function csvCell(value){return '"'+String(value??'').replaceAll('"','""')+'"'}
-$('submit').addEventListener('click',async()=>{const url=$('url').value.trim();if(!url){setStatus('error','Vui lòng nhập URL.');return}stopTimer();start=performance.now();$('submit').disabled=true;$('detail').textContent='';setStatus('processing','Đang xử lý...');const update=()=>{$('timer').textContent=((performance.now()-start)/1000).toFixed(1)+'s'};update();tick=setInterval(update,100);try{const response=await fetch(getApiBase()+'/api/bypass',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});const data=await response.json();stopTimer();const elapsed=Number(data.time_taken??((performance.now()-start)/1000)).toFixed(2);$('timer').textContent=elapsed+'s';if(!response.ok){const d=data.detail||{};setStatus('error',d.message||'Yêu cầu không hợp lệ.',d.code||'HTTP '+response.status);return}if(data.success&&data.bypassed_url){setStatus('success','Hoàn thành trong '+elapsed+'s');const result=document.createElement('div');result.className='result';result.textContent=data.bypassed_url;$('detail').append(result);const copy=document.createElement('button');copy.className='small';copy.textContent='Copy link đích';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(data.bypassed_url);copy.textContent='Đã copy'}catch{copy.textContent='Không thể copy'}});$('detail').append(copy)}else{const err=data.error||{};setStatus('error',err.message||'Không tìm thấy URL đích.',err.code||'UNKNOWN_ERROR')}const items=history();items.unshift({original:url,destination:data.bypassed_url||null,success:!!data.success,time:elapsed,at:new Date().toISOString()});save(items)}catch(e){stopTimer();setStatus('error',e.message||'Không thể kết nối máy chủ.','Kiểm tra URL backend, cấu hình CORS hoặc trạng thái Render.')}finally{$('submit').disabled=false}});
+$('submit').addEventListener('click',async()=>{
+const url=$('url').value.trim();
+if(!url){stopTimer();$('timer').textContent='';setStatus('error','Vui lòng nhập URL.');return}
+let apiBase;
+try{apiBase=getApiBase()}catch(e){stopTimer();$('timer').textContent='';setStatus('error','Chưa cấu hình backend.',e.message+' Mở “Cấu hình máy chủ API”, nhập URL Render đã deploy rồi nhấn “Kiểm tra kết nối”.');return}
+stopTimer();start=performance.now();$('submit').disabled=true;$('detail').textContent='';setStatus('processing','Đang xử lý...');
+const update=()=>{$('timer').textContent=((performance.now()-start)/1000).toFixed(1)+'s'};
+update();tick=setInterval(update,100);
+try{
+const response=await fetch(apiBase+'/api/bypass',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+const data=await response.json();
+stopTimer();const elapsed=Number(data.time_taken??((performance.now()-start)/1000)).toFixed(2);$('timer').textContent=elapsed+'s';
+if(!response.ok){const d=data.detail||{};setStatus('error',d.message||'Yêu cầu không hợp lệ.',d.code||'HTTP '+response.status);return}
+if(data.success&&data.bypassed_url){
+setStatus('success','Hoàn thành trong '+elapsed+'s');
+const result=document.createElement('div');result.className='result';result.textContent=data.bypassed_url;$('detail').append(result);
+const copy=document.createElement('button');copy.className='small';copy.textContent='Copy link đích';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(data.bypassed_url);copy.textContent='Đã copy'}catch{copy.textContent='Không thể copy'}});$('detail').append(copy)
+}else{const err=data.error||{};setStatus('error',err.message||'Không tìm thấy URL đích.',err.code||'UNKNOWN_ERROR')}
+const items=history();items.unshift({original:url,destination:data.bypassed_url||null,success:!!data.success,time:elapsed,at:new Date().toISOString()});save(items)
+}catch(e){stopTimer();setStatus('error','Không kết nối được backend.',e.name==='AbortError'?'Máy chủ phản hồi quá thời gian.':'Kiểm tra địa chỉ Render, trạng thái dịch vụ và CORS.')}
+finally{$('submit').disabled=false}
+});
 $('url').addEventListener('keydown',e=>{if(e.key==='Enter')$('submit').click()});
 $('clear').addEventListener('click',()=>{sessionStorage.removeItem(KEY);renderHistory()});
 $('export-json').addEventListener('click',()=>download('auto-bypass-history.json','application/json',JSON.stringify(history(),null,2)));
